@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+.links line{
+  /*stroke: #999;*/
+  stroke-opacity: 0.6;
+  stroke-width: 2.0;
+}
+
+.nodes circle{
+  stroke: #fff;
+  stroke-width: 2.5px;
+}
+
+</style>
+
+
+<svg width="1800" height="1000"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+
+
+<script>
+var baseNodes = [
+
+	//Degree baseNodes
+	{ id: "Accounting and Finance", group: 0, label: "Accounting and Finance", level: 1, radius: 15},
+	{ id: "Laws", group: 0, label: "Laws", level: 1, radius: 15},
+	{ id: "Business", group: 0, label: "Business", level: 1, radius: 15},
+	{ id: "Computer Science", group: 0, label: "Computer Science", level: 1, radius: 15},
+	{ id: "Public Health", group: 0, label: "Public Health", level: 1, radius: 15},
+	
+	//Malaysian Degree Nodes
+	{ id: "Malaysian Degrees", group: 1, label: "Malaysian Degrees", level: 2, radius: 12},
+	{ id: "Accounting and Finance (Malaysia)", group: 1, label: "Accounting and Finance (Malaysia)", level: 2, radius: 12},
+	{ id: "Laws (Malaysia)", group: 1, label: "Laws (Malaysia)", level: 2, radius: 12},
+	{ id: "Business (Malaysia)", group: 1, label: "Business (Malaysia)", level: 2, radius: 12},
+	{ id: "Computer Science (Malaysia)", group: 1, label: "Computer Science (Malaysia)", level: 2, radius: 12},
+	{ id: "Public Health (Malaysia)", group: 1, label: "Public Health (Malaysia)", level: 2, radius: 12},
+	
+	//Singapore Degree Nodes
+	{ id: "Singaporean Degrees", group: 2, label: "Singaporean Degrees", level: 2, radius: 12},
+	{ id: "Accounting and Finance (Singapore)", group: 2, label: "Accounting and Finance (Singapore)", level: 2, radius: 12},
+	{ id: "Laws (Singapore)", group: 2, label: "Laws (Singapore)", level: 2, radius: 12},
+	{ id: "Business (Singapore)", group: 2, label: "Business (Singapore)", level: 2, radius: 12},
+	{ id: "Computer Science (Singapore)", group: 2, label: "Computer Science (Singapore)", level: 2, radius: 12},
+	{ id: "Public Health (Singapore)", group: 2, label: "Public Health (Singapore)", level: 2, radius: 12},
+	
+	//Hong Kong Degree Nodes
+	{ id: "Hong Kong Degrees", group: 3, label: "Hong Kong Degrees", level: 2, radius: 12},
+	{ id: "Accounting and Finance (Hong Kong)", group: 3, label: "Accounting and Finance (Hong Kong)", level: 2, radius: 12},
+	{ id: "Laws (Hong Kong)", group: 3, label: "Laws (Hong Kong)", level: 2, radius: 12},
+	{ id: "Business (Hong Kong)", group: 3, label: "Business (Hong Kong)", level: 2, radius: 12},
+	{ id: "Computer Science (Hong Kong)", group: 3, label: "Computer Science (Hong Kong)", level: 2, radius: 12},
+	
+	//UAE Degree Nodes
+	{ id: "UAE Degrees", group: 4, label: "UAE Degrees", level: 2, radius: 12},
+	{ id: "Accounting and Finance (UAE)", group: 4, label: "Accounting and Finance (UAE)", level: 2, radius: 12},
+	{ id: "Laws (UAE)", group: 4, label: "Laws (UAE)", level: 2, radius: 12},
+	{ id: "Business (UAE)", group: 4, label: "Business (UAE)", level: 2, radius: 12},
+	{ id: "Computer Science (UAE)", group: 4, label: "Computer Science (UAE)", level: 2, radius: 12},
+	
+	//Ghana Degree Nodes
+	{ id: "Ghana Degrees", group: 5, label: "Ghana Degrees", level: 2, radius: 12},
+	{ id: "Accounting and Finance (Ghana)", group: 5, label: "Accounting and Finance (Ghana)", level: 2, radius: 12},
+	{ id: "Computer Science (Ghana)", group: 5, label: "Computer Science (Ghana)", level: 2, radius: 12},
+	
+	//India Degree Nodes
+	{ id: "Indian Degrees", group: 6, label: "Indian Degrees", level: 2, radius: 12},
+	{ id: "Business (India)", group: 6, label: "Business (India)", level: 2, radius: 12},
+	{ id: "Computer Science (India)", group: 6, label: "Computer Science (India)", level: 2, radius: 12},
+	
+	
+	
+	//Country Nodes
+	{ id: "UK Universities", group: 0, label: "UK Universities", level: 1, radius: 25},
+	{ id: "Malaysian Universities", group: 1, label: "Malaysian Universities", level: 1, radius: 25},
+	{ id: "Singaporean Universities", group: 2, label: "Singaporean Universities", level: 1, radius: 25},
+	{ id: "Hong Kong Universities", group: 3, label: "Hong Kong Universities", level: 1, radius: 25},
+	{ id: "UAE Universities", group: 4, label: "UAE Universities", level: 1, radius: 25},
+	{ id: "Ghanaian Universities", group: 5, label: "Ghanaian Universities", level: 1, radius: 25},
+	{ id: "Indian Universities", group: 6, label: "Indian Universities", level: 1, radius: 25},
+	
+	//UK University Nodes
+	{ id: "Abertay University", group: 0, label: "Abertay University", level: 1},
+	{ id: "Aberystwyth University", group: 0, label: "Aberystwyth University", level: 1},
+	{ id: "Anglia Ruskin University", group: 0, label: "Anglia Ruskin University", level: 1},
+	{ id: "Arden University", group: 0, label: "Arden University", level: 1},
+	{ id: "Bangor University", group: 0, label: "Bangor University", level: 1},
+	{ id: "Bath Spa University", group: 0, label: "Bath Spa University", level: 1},
+	{ id: "University of Bedfordshire", group: 0, label: "University of Bedfordshire", level: 1},
+	{ id: "University of Birmingham", group: 0, label: "University of Birmingham", level: 1},
+	{ id: "Birmingham City University", group: 0, label: "Birmingham City University", level: 1},
+	{ id: "University College Birmingham", group: 0, label: "University College Birmingham", level: 1},
+	{ id: "University of Bolton", group: 0, label: "University of Bolton", level: 1},
+	{ id: "University of Bradford", group: 0, label: "University of Bradford", level: 1},
+	{ id: "UWE Bristol", group: 0, label: "UWE Bristol", level: 1},
+	{ id: "University of Cambridge International Examinations", group: 0, label: "University of Cambridge International Examinations", level: 1},
+	{ id: "Cardiff University", group: 0, label: "Cardiff University", level: 1},
+	{ id: "Cardiff Metropolitan University", group: 0, label: "Cardiff Metropolitan University", level: 1},
+	{ id: "University of Chester", group: 0, label: "University of Chester", level: 1},
+	{ id: "City University London", group: 0, label: "City University London", level: 1},
+	{ id: "Coventry University", group: 0, label: "Coventry University", level: 1},
+	{ id: "De Montfort University", group: 0, label: "De Montfort University", level: 1},
+	{ id: "University of Derby", group: 0, label: "University of Derby", level: 1},
+	{ id: "University of East Anglia", group: 0, label: "University of East Anglia", level: 1},
+	{ id: "University of East London", group: 0, label: "University of East London", level: 1},
+	{ id: "Edge Hill University", group: 0, label: "Edge Hill University", level: 1},
+	{ id: "University of Edinburgh", group: 0, label: "University of Edinburgh", level: 1},
+	{ id: "Edinburgh Napier University", group: 0, label: "Edinburgh Napier University", level: 1},
+	{ id: "University of Essex", group: 0, label: "University of Essex", level: 1},
+	{ id: "University of Essex Online", group: 0, label: "University of Essex Online", level: 1},
+	{ id: "University of Glasgow", group: 0, label: "University of Glasgow", level: 1},
+	{ id: "University of Glamorgan", group: 0, label: "University of Glamorgan", level: 1},
+	{ id: "University of Gloucestershire", group: 0, label: "University of Gloucestershire", level: 1},
+	{ id: "Glyndwr University", group: 0, label: "Glyndwr University", level: 1},
+	{ id: "University of Greenwich", group: 0, label: "University of Greenwich", level: 1},
+	{ id: "Heriot-Watt University", group: 0, label: "Heriot-Watt University", level: 1},
+	{ id: "University of Hertfordshire", group: 0, label: "University of Hertfordshire", level: 1},
+	{ id: "University of Huddersfield", group: 0, label: "University of Huddersfield", level: 1},
+	{ id: "University of Hull", group: 0, label: "University of Hull", level: 1},
+	{ id: "Kingston University", group: 0, label: "Kingston University", level: 1},
+	{ id: "University of Central Lancashire", group: 0, label: "University of Central Lancashire", level: 1},
+	{ id: "Lancaster University", group: 0, label: "Lancaster University", level: 1},
+	{ id: "Leeds Beckett University", group: 0, label: "Leeds Beckett University", level: 1},
+	{ id: "University of Leeds", group: 0, label: "University of Leeds", level: 1},
+	{ id: "University of Leicester", group: 0, label: "University of Leicester", level: 1},
+	{ id: "University of Lincoln", group: 0, label: "University of Lincoln", level: 1},
+	{ id: "Liverpool John Moores University", group: 0, label: "Liverpool John Moores University", level: 1},
+	{ id: "University of Liverpool", group: 0, label: "University of Liverpool", level: 1},
+	{ id: "University of London International Programmes", group: 0, label: "University of London International Programmes", level: 1},
+	{ id: "Goldsmiths", group: 0, label: "Goldsmiths", level: 1},
+	{ id: "London Business School", group: 0, label: "London Business School", level: 1},
+	{ id: "London School of Economics and Political Science", group: 0, label: "London School of Economics and Political Science", level: 1},
+	{ id: "Royal Holloway", group: 0, label: "Royal Holloway", level: 1},
+	{ id: "London School of Business and Finance", group: 0, label: "London School of Business and Finance", level: 1},
+	{ id: "London School of Commerce", group: 0, label: "London School of Commerce", level: 1},
+	{ id: "London South Bank University", group: 0, label: "London South Bank University", level: 1},
+	{ id: "Loughborough University", group: 0, label: "Loughborough University", level: 1},
+	{ id: "Manchester Metropolitan University", group: 0, label: "Manchester Metropolitan University", level: 1},
+	{ id: "The University of Manchester", group: 0, label: "The University of Manchester", level: 1},
+	{ id: "Middlesex University", group: 0, label: "Middlesex University", level: 1},
+	{ id: "Northumbria University", group: 0, label: "Northumbria University", level: 1},
+	{ id: "University of Northampton", group: 0, label: "University of Northampton", level: 1},
+	{ id: "Nottingham Trent University", group: 0, label: "Nottingham Trent University", level: 1},
+	{ id: "The Open University", group: 0, label: "The Open University", level: 1},
+	{ id: "Oxford Brookes University", group: 0, label: "University of Northampton", level: 1},
+	{ id: "Pembrokeshire College", group: 0, label: "Pembrokeshire College", level: 1},
+	{ id: "Plymouth University", group: 0, label: "Plymouth University", level: 1},
+	{ id: "University of Portsmouth", group: 0, label: "University of Portsmouth", level: 1},
+	{ id: "Queen's University Belfast", group: 0, label: "Queen's University Belfast", level: 1},
+	{ id: "Queen Margaret University", group: 0, label: "Queen Margaret University", level: 1},
+	{ id: "University of Reading", group: 0, label: "University of Reading", level: 1},
+	{ id: "University of Roehampton", group: 0, label: "University of Roehampton", level: 1},
+	{ id: "University of Salford", group: 0, label: "University of Salford", level: 1},
+	{ id: "University of Sheffield", group: 0, label: "University of Sheffield", level: 1},
+	{ id: "Sheffield Hallam University", group: 0, label: "Sheffield Hallam University", level: 1},
+	{ id: "Southampton Solent University", group: 0, label: "Southampton Solent University", level: 1},
+	{ id: "University of South Wales", group: 0, label: "University of South Wales", level: 1},
+	{ id: "Staffordshire University", group: 0, label: "Staffordshire University", level: 1},
+	{ id: "University of Stirling", group: 0, label: "University of Stirling", level: 1},
+	{ id: "University of Strathclyde", group: 0, label: "University of Strathclyde", level: 1},
+	{ id: "University of Sunderland", group: 0, label: "University of Sunderland", level: 1},
+	{ id: "Teesside University", group: 0, label: "Teesside University", level: 1},
+	{ id: "University of Wales", group: 0, label: "University of Wales", level: 1},
+	{ id: "University of Wales Trinity Saint David", group: 0, label: "University of Wales Trinity Saint David", level: 1},
+	{ id: "University of Wales, Newport", group: 0, label: "University of Wales, Newport", level: 1},
+	{ id: "University of Warwick", group: 0, label: "University of Warwick", level: 1},
+	{ id: "University of West of England", group: 0, label: "University of West of England", level: 1},
+	{ id: "University of West of Scotland", group: 0, label: "University of West of Scotland", level: 1},
+	{ id: "University of Wolverhampton", group: 0, label: "University of Wolverhampton", level: 1},
+	{ id: "The University of York Online", group: 0, label: "The University of York Online", level: 1},
+	{ id: "York St John University", group: 0, label: "York St John University", level: 1},
+
+
+
+
+	
+	//Malaysia University Nodes
+	{ id: "SEGi University", group: 1, label: "SEGi University", level: 1},
+	{ id: "Brickfields Asia College", group: 1, label: "Brickfields Asia College", level: 1},
+	{ id: "HELP University", group: 1, label: "HELP University", level: 1},
+	{ id: "FTMS Global Academy", group: 1, label: "FTMS Global Academy", level: 1},
+	{ id: "First City University College", group: 1, label: "First City University College", level: 1},
+	{ id: "HELP College of Arts & Technology", group: 1, label: "HELP College of Arts & Technology", level: 1},
+	{ id: "MAHSA University College", group: 1, label: "MAHSA University College", level: 1},
+	{ id: "Kolej PTPL Penang", group: 1, label: "Kolej PTPL Penang", level: 1},
+	{ id: "Taylor's University", group: 1, label: "Taylor's University", level: 1},
+	{ id: "UCSI University", group: 1, label: "UCSI University", level: 1},
+	{ id: "Olympia College", group: 1, label: "Olympia College", level: 1},
+	{ id: "KDU College Penang", group: 1, label: "KDU College Penang", level: 1},
+	{ id: "INTI International University", group: 1, label: "INTI International University", level: 1},
+	
+	//Sinapore University Nodes
+	{ id: "Amity Global Business School", group: 2, label: "Amity Global Business School", level: 1},
+	{ id: "Management Development Institute of Singapore", group: 2, label: "Management Development Institute of Singapore", level: 1},
+	{ id: "Training Vision Institute", group: 2, label: "Training Vision Institute", level: 1},
+	{ id: "Kaplan Higher Education", group: 2, label: "Kaplan Higher Education", level: 1},
+	{ id: "SIM Global Education", group: 2, label: "SIM Global Education", level: 1},
+	{ id: "AEC College", group: 2, label: "AEC College", level: 1},
+	{ id: "Auston Institute of Management", group: 2, label: "Auston Institute of Management", level: 1},
+	{ id: "BMC International College", group: 2, label: "BMC International College", level: 1},
+	{ id: "East Asia Institute of Management", group: 2, label: "East Asia Institute of Management", level: 1},
+	{ id: "Dimensions International College", group: 2, label: "Dimensions International College", level: 1},
+	{ id: "PSB Academy", group: 2, label: "PSB Academy", level: 1},
+	{ id: "Aventis School of Management", group: 2, label: "Aventis School of Management", level: 1},
+	{ id: "Lithan Academy", group: 2, label: "Lithan Academy", level: 1},
+	
+	//Hong Kong University Nodes
+	{ id: "RDI Management Learning Ltd", group: 3, label: "RDI Management Learning Ltd", level: 1},
+	{ id: "Aston Institute", group: 3, label: "Aston Institute", level: 1},
+	{ id: "Centre of Educational Development", group: 3, label: "Centre of Educational Development", level: 1},
+	{ id: "SHAPE", group: 3, label: "SHAPE", level: 1},
+	{ id: "SCOPE", group: 3, label: "SCOPE", level: 1},
+	
+	//UAE University Nodes
+	{ id: "Western International College FZE Ras Al Khaimah", group: 4, label: "Western International College FZE Ras Al Khaimah", level: 1},
+	{ id: "Dubai Knowledge Centre", group: 4, label: "Dubai Knowledge Centre", level: 1},	
+	{ id: "Cass Business School Dubai", group: 4, label: "Cass Business School Dubai", level: 1},
+	{ id: "Emirates Aviation University", group: 4, label: "Emirates Aviation University", level: 1},
+	
+	//Ghana University Nodes
+	{ id: "Ghana Technology University College", group: 5, label: "Ghana Technology University College", level: 1},
+
+	//India University Nodes
+	{ id: "Daly College Business School", group: 6, label: "Daly College Business School", level: 1},
+	
+	
+	
+]
+
+var baseLinks =[
+
+	//Degree baseNode-to-Degree Country Node
+	//Accounting and Finance
+	{target:"Accounting and Finance",source:"Accounting and Finance (Malaysia)", strength: 0.4 },
+	{target:"Accounting and Finance",source:"Accounting and Finance (Singapore)", strength: 0.4 },
+	{target:"Accounting and Finance",source:"Accounting and Finance (Hong Kong)", strength: 0.4 },
+	{target:"Accounting and Finance",source:"Accounting and Finance (UAE)", strength: 0.4 },
+	{target:"Accounting and Finance",source:"Accounting and Finance (Ghana)", strength: 0.4 },
+	
+	//Business
+	{target:"Business",source:"Business (Malaysia)", strength: 0.4 },
+	{target:"Business",source:"Business (Singapore)", strength: 0.4 },
+	{target:"Business",source:"Business (Hong Kong)", strength: 0.4 },
+	{target:"Business",source:"Business (UAE)", strength: 0.4 },
+	{target:"Business",source:"Business (India)", strength: 0.4 },
+	
+	//Laws
+	{target:"Laws",source:"Laws (Malaysia)", strength: 0.4 },
+	{target:"Laws",source:"Laws (Singapore)", strength: 0.4 },
+	{target:"Laws",source:"Laws (Hong Kong)", strength: 0.4 },
+	{target:"Laws",source:"Laws (UAE)", strength: 0.4 },
+		
+	//Computer Science
+	{target:"Computer Science",source:"Computer Science (Malaysia)", strength: 0.4 },
+	{target:"Computer Science",source:"Computer Science (Singapore)", strength: 0.4 },
+	{target:"Computer Science",source:"Computer Science (Hong Kong)", strength: 0.4 },
+	{target:"Computer Science",source:"Computer Science (UAE)", strength: 0.4 },
+	{target:"Computer Science",source:"Computer Science (Ghana)", strength: 0.4 },
+	{target:"Computer Science",source:"Computer Science (India)", strength: 0.4 },
+	
+	//Public Health
+	{target:"Public Health",source:"Public Health (Malaysia)", strength: 0.4 },
+	{target:"Public Health",source:"Public Health (Singapore)", strength: 0.4 },
+
+	//Country Nodes-to-Degree Nodes
+	//Malaysia
+	{target:"Malaysian Degrees",source:"Malaysian Universities", strength: 0.5 },
+	{target:"Malaysian Degrees",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"Malaysian Degrees",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"Malaysian Degrees",source:"Computer Science (Malaysia)", strength: 0.5 },
+	{target:"Malaysian Degrees",source:"Laws (Malaysia)", strength: 0.5 },
+	{target:"Malaysian Degrees",source:"Public Health (Malaysia)", strength: 0.5 },
+	
+	//Singapore
+	{target:"Singaporean Degrees",source:"Singaporean Universities", strength: 0.5 },
+	{target:"Singaporean Degrees",source:"Accounting and Finance (Singapore)", strength: 0.5 },
+	{target:"Singaporean Degrees",source:"Business (Singapore)", strength: 0.5 },
+	{target:"Singaporean Degrees",source:"Computer Science (Singapore)", strength: 0.5 },
+	{target:"Singaporean Degrees",source:"Laws (Singapore)", strength: 0.5 },
+	{target:"Singaporean Degrees",source:"Public Health (Singapore)", strength: 0.5 },
+	
+	//Hong Kong
+	{target:"Hong Kong Degrees",source:"Hong Kong Universities", strength: 0.5 },
+	{target:"Hong Kong Degrees",source:"Accounting and Finance (Hong Kong)", strength: 0.5 },
+	{target:"Hong Kong Degrees",source:"Business (Hong Kong)", strength: 0.5 },
+	{target:"Hong Kong Degrees",source:"Computer Science (Hong Kong)", strength: 0.5 },
+	{target:"Hong Kong Degrees",source:"Laws (Hong Kong)", strength: 0.5 },
+	
+	//UAE
+	{target:"UAE Degrees",source:"UAE Universities", strength: 0.5 },
+	{target:"UAE Degrees",source:"Accounting and Finance (UAE)", strength: 0.5 },
+	{target:"UAE Degrees",source:"Business (UAE)", strength: 0.5 },
+	{target:"UAE Degrees",source:"Computer Science (UAE)", strength: 0.5 },
+	{target:"UAE Degrees",source:"Laws (UAE)", strength: 0.5 },
+	
+	//Ghana
+	{target:"Ghana Degrees",source:"Ghanaian Universities", strength: 0.5 },
+	{target:"Ghana Degrees",source:"Accounting and Finance (Ghana)", strength: 0.5 },
+	{target:"Ghana Degrees",source:"Computer Science (Ghana)", strength: 0.5 },
+	
+	//India
+	{target:"Indian Degrees",source:"Indian Universities", strength: 0.5 },
+	{target:"Indian Degrees",source:"Computer Science (India)", strength: 0.5 },
+	{target:"Indian Degrees",source:"Business (India)", strength: 0.5 },
+	
+	
+	
+	
+	//UK-to-UK University
+	{target:"UK Universities",source:"Abertay University", strength: 0.7 },
+	{target:"UK Universities",source:"Aberystwyth University", strength: 0.7 },
+	{target:"UK Universities",source:"Anglia Ruskin University", strength: 0.7 },
+	{target:"UK Universities",source:"Arden University", strength: 0.7 },
+	{target:"UK Universities",source:"Bangor University", strength: 0.7 },
+	{target:"UK Universities",source:"Bath Spa University", strength: 0.7 },
+	{target:"UK Universities",source:"University of Bedfordshire", strength: 0.7 },
+	{target:"UK Universities",source:"University of Birmingham", strength: 0.7 },
+	{target:"UK Universities",source:"Birmingham City University", strength: 0.7 },
+	{target:"UK Universities",source:"University College Birmingham", strength: 0.7 },
+	{target:"UK Universities",source:"University of Bolton", strength: 0.7 },
+	{target:"UK Universities",source:"University of Bradford", strength: 0.7 },
+	{target:"UK Universities",source:"UWE Bristol", strength: 0.7 },
+	{target:"UK Universities",source:"University of Cambridge International Examinations", strength: 0.7 },
+	{target:"UK Universities",source:"Cardiff University", strength: 0.7 },
+	{target:"UK Universities",source:"Cardiff Metropolitan University", strength: 0.7 },
+	{target:"UK Universities",source:"University of Chester", strength: 0.7 },
+	{target:"UK Universities",source:"City University London", strength: 0.7 },
+	{target:"UK Universities",source:"Coventry University", strength: 0.7 },
+	{target:"UK Universities",source:"De Montfort University", strength: 0.7 },
+	{target:"UK Universities",source:"University of Derby", strength: 0.7 },
+	{target:"UK Universities",source:"University of East Anglia", strength: 0.7 },
+	
+	//UK University-to-Partner
+	{target:"Abertay University",source:"SEGi University", strength: 0.1 },
+	{target:"Aberystwyth University",source:"Brickfields Asia College", strength: 0.1 },
+	{target:"Aberystwyth University",source:"HELP University", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"Amity Global Business School", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"FTMS Global Academy", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"First City University College", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"HELP College of Arts & Technology", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"MAHSA University College", strength: 0.1 },
+	{target:"Anglia Ruskin University",source:"Kolej PTPL Penang", strength: 0.1 },
+	{target:"Arden University",source:"RDI Management Learning Ltd", strength: 0.1 },
+	{target:"Bangor University",source:"Management Development Institute of Singapore", strength: 0.1 },
+	{target:"Bath Spa University",source:"Training Vision Institute", strength: 0.1 },
+	{target:"University of Bedfordshire",source:"Kaplan Higher Education", strength: 0.1 },
+	{target:"University of Birmingham",source:"SIM Global Education", strength: 0.1 },
+	{target:"Birmingham City University",source:"AEC College", strength: 0.1 },
+	{target:"Birmingham City University",source:"Auston Institute of Management", strength: 0.1 },
+	{target:"Birmingham City University",source:"Kaplan Higher Education", strength: 0.1 },
+	{target:"Birmingham City University",source:"Brickfields Asia College", strength: 0.1 },
+	{target:"University College Birmingham",source:"Aston Institute", strength: 0.1 },
+	{target:"University of Bolton",source:"Centre of Educational Development", strength: 0.1 },
+	{target:"University of Bolton",source:"Western International College FZE Ras Al Khaimah", strength: 0.1 },
+	{target:"University of Bradford",source:"Dubai Knowledge Centre", strength: 0.1 },
+	{target:"University of Bradford",source:"RDI Management Learning Ltd", strength: 0.1 },
+	{target:"UWE Bristol",source:"Taylor's University", strength: 0.1 },
+	{target:"UWE Bristol",source:"UCSI University", strength: 0.1 },
+	{target:"UWE Bristol",source:"Olympia College", strength: 0.1 },
+	{target:"UWE Bristol",source:"SHAPE", strength: 0.1	},
+	{target:"University of Cambridge International Examinations",source:"BMC International College", strength: 0.1 },
+	{target:"Cardiff University",source:"Brickfields Asia College", strength: 0.1 },
+	{target:"Cardiff University",source:"HELP University", strength: 0.1 },
+	{target:"Cardiff University",source:"Taylor's University", strength: 0.1 },
+	{target:"Cardiff Metropolitan University",source:"East Asia Institute of Management", strength: 0.1 },
+	{target:"Cardiff Metropolitan University",source:"Dimensions International College", strength: 0.1 },
+	{target:"University of Chester",source:"Dimensions International College", strength: 0.1 },
+	{target:"University of Chester",source:"KDU College Penang", strength: 0.1 },
+	{target:"City University London",source:"Cass Business School Dubai", strength: 0.1 },
+	{target:"Coventry University",source:"PSB Academy", strength: 0.1 },
+	{target:"Coventry University",source:"Emirates Aviation University", strength: 0.1 },
+	{target:"Coventry University",source:"Ghana Technology University College", strength: 0.1 },
+	{target:"Coventry University",source:"SCOPE", strength: 0.1 },
+	{target:"Coventry University",source:"SHAPE", strength: 0.1 },
+	{target:"Coventry University",source:"INTI International University", strength: 0.1 },
+	{target:"De Montfort University",source:"Brickfields Asia College", strength: 0.1 },
+	{target:"De Montfort University",source:"Daly College Business School", strength: 0.1 },
+	{target:"University of Derby",source:"Aventis School of Management", strength: 0.1 },
+	{target:"University of Derby",source:"RDI Management Learning Ltd", strength: 0.1 },
+	{target:"University of Derby",source:"HELP University", strength: 0.1 },
+	{target:"University of East Anglia",source:"Brickfields Asia College", strength: 0.7 },
+	
+	//Malaysia-to-Malaysian Partner
+	{target:"Malaysian Universities",source:"SEGi University", strength: 0.7 },
+	{target:"Malaysian Universities",source:"Brickfields Asia College", strength: 0.7 },
+	{target:"Malaysian Universities",source:"HELP University", strength: 0.7 },
+	{target:"Malaysian Universities",source:"FTMS Global Academy", strength: 0.7 },
+	{target:"Malaysian Universities",source:"First City University College", strength: 0.7 },
+	{target:"Malaysian Universities",source:"HELP College of Arts & Technology", strength: 0.7 },
+	{target:"Malaysian Universities",source:"MAHSA University College", strength: 0.7 },
+	{target:"Malaysian Universities",source:"Kolej PTPL Penang", strength: 0.7 },
+	{target:"Malaysian Universities",source:"Taylor's University", strength: 0.7 },
+	{target:"Malaysian Universities",source:"UCSI University", strength: 0.7 },
+	{target:"Malaysian Universities",source:"Olympia College", strength: 0.7 },
+	{target:"Malaysian Universities",source:"KDU College Penang", strength: 0.7 },
+	{target:"Malaysian Universities",source:"INTI International University", strength: 0.7 },
+	
+	//Singapore-to-Singapore Partner
+	{target:"Singaporean Universities",source:"Amity Global Business School", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Management Development Institute of Singapore", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Training Vision Institute", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Kaplan Higher Education", strength: 0.7 },
+	{target:"Singaporean Universities",source:"SIM Global Education", strength: 0.7 },
+	{target:"Singaporean Universities",source:"AEC College", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Auston Institute of Management", strength: 0.7 },
+	{target:"Singaporean Universities",source:"BMC International College", strength: 0.7 },
+	{target:"Singaporean Universities",source:"East Asia Institute of Management", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Dimensions International College", strength: 0.7 },
+	{target:"Singaporean Universities",source:"PSB Academy", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Aventis School of Management", strength: 0.7 },
+	{target:"Singaporean Universities",source:"Lithan Academy", strength: 0.7 },
+
+	//Hong Kong-to-Hong Kong Partner
+	{target:"Hong Kong Universities",source:"RDI Management Learning Ltd", strength: 0.7 },
+	{target:"Hong Kong Universities",source:"Aston Institute", strength: 0.7 },
+	{target:"Hong Kong Universities",source:"Centre of Educational Development", strength: 0.7 },
+	{target:"Hong Kong Universities",source:"SHAPE", strength: 0.7 },
+	{target:"Hong Kong Universities",source:"SCOPE", strength: 0.7 },
+	
+	//UAE-to-UAE Partner
+	{target:"UAE Universities",source:"Western International College FZE Ras Al Khaimah", strength: 0.7 },
+	{target:"UAE Universities",source:"Dubai Knowledge Centre", strength: 0.7 },
+	{target:"UAE Universities",source:"Cass Business School Dubai", strength: 0.7 },
+	{target:"UAE Universities",source:"Emirates Aviation University", strength: 0.7 },
+	
+	//Ghana-to-Ghana Partner
+	{target:"Ghanaian Universities",source:"Ghana Technology University College", strength: 0.7 },
+
+	//India-to-India Partner
+	{target:"Indian Universities",source:"Daly College Business School", strength: 0.7 },
+	
+	
+	
+	//Degree Nodes-to-Malaysia Partner
+	//Accounting
+	{target:"SEGi University",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"FTMS Global Academy",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"First City University College",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"HELP College of Arts & Technology",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"MAHSA University College",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"Kolej PTPL Penang",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"Taylor's University",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	{target:"INTI International University",source:"Accounting and Finance (Malaysia)", strength: 0.5 },
+	
+	//Business
+	{target:"SEGi University",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"Brickfields Asia College",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"FTMS Global Academy",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"First City University College",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"HELP College of Arts & Technology",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"MAHSA University College",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"Taylor's University",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"UCSI University",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"Olympia College",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"KDU College Penang",source:"Business (Malaysia)", strength: 0.5 },
+	{target:"INTI International University",source:"Business (Malaysia)", strength: 0.5 },
+	
+	//Computer Science
+
+	{target:"SEGi University",source:"Computer Science (Malaysia)", strength: 0.5 },
+	{target:"HELP College of Arts & Technology",source:"Computer Science (Malaysia)", strength: 0.5 },
+	{target:"Taylor's University",source:"Computer Science (Malaysia)", strength: 0.5 },
+	{target:"INTI International University",source:"Computer Science (Malaysia)", strength: 0.5 },
+	
+	//Laws
+	{target:"Brickfields Asia College",source:"Laws (Malaysia)", strength: 0.5 },
+	{target:"HELP University",source:"Laws (Malaysia)", strength: 0.5 },
+	{target:"Taylor's University",source:"Laws (Malaysia)", strength: 0.5 },
+		
+	//Public Health	
+	{target:"MAHSA University College",source:"Public Health (Malaysia)", strength: 0.5 },
+	
+	
+]	
+
+
+	
+//Neigbour Identifier	
+var nodes = [...baseNodes]
+var links = [...baseLinks]
+function getNeighbors(node) {
+  return baseLinks.reduce(function (neighbors, link) {
+      if (link.target.id === node.id) {
+        neighbors.push(link.source.id)
+      } else if (link.source.id === node.id) {
+        neighbors.push(link.target.id)
+      }
+      return neighbors
+    },
+    [node.id]
+  )
+}
+function isNeighborLink(node, link) {
+  return link.target.id === node.id || link.source.id === node.id
+}
+
+
+//Neighbour colour
+function getNodeColor(node, neighbors) {
+  if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
+    if (node.group === 0) {
+	  return 'rgba(255,0,0,1.0)'//'red'
+	}
+	else if (node.radius === 12) {
+	  return 'rgba(0,153,51,1.0)'//SPECIFIC TO PARTNER DEGREE NODES
+	}
+	else if (node.group === 1) {
+	  return 'rgba(51,51,255,1.0)'//'blue'
+	}
+	else if (node.group === 2) {
+	  return 'rgba(255,153,51,1.0)'//'orange'
+	}
+	else if (node.group === 3) {
+	  return 'rgba(153,0,153,1.0)'//'purple'
+	}
+	else if (node.group === 4) {
+	  return 'rgba(0,0,153,1.0)'//'MidnightBlue'
+	}
+	else if (node.group === 5) {
+	  return 'rgba(0,204,153,1.0)'//'LightGreen'
+	}
+	else if (node.group === 6) {
+	  return 'rgba(255,102,255,1.0)'//'RebeccaPurple'
+	}
+	else if (node.group === 7) {
+	  return 'rgba(204,0,102,1.0)'//SPECIFIC TO UK DEGREE NODE
+	}
+	else {
+	  return 'rgba(102,153,153,1.0)'//'void'
+	}
+  }
+  //determines 'resting' color
+  if (node.group === 0) {
+	  return 'rgba(255,0,0,0.4)'//'red'
+	}
+	else if (node.radius === 12) {
+	  return 'rgba(0,153,51,0.4)'//SPECIFIC TO DEGREE NODES
+	}
+	else if (node.group === 1) {
+	  return 'rgba(51,51,255,0.4)'//'blue'
+	}
+	else if (node.group === 2) {
+	  return 'rgba(255,153,51,0.4)'//'orange'
+	}
+	else if (node.group === 3) {
+	  return 'rgba(153,0,153,0.4)'//'purple'
+	}
+	else if (node.group === 4) {
+	  return 'rgba(0,0,153,0.4)'//'MidnightBlue'
+	}
+	else if (node.group === 5) {
+	  return 'rgba(0,204,153,0.4)'//'LightGreen'
+	}
+	else if (node.group === 6) {
+	  return 'rgba(255,102,255,0.4)'//'RebeccaPurple'
+	}
+	else if (node.group === 7) {
+	  return 'rgba(204,0,102,0.4)'//SPECIFIC TO UK DEGREE NODE
+	}
+	else {
+	  return 'rgba(102,153,153,0.4)'//'void'
+	}
+}
+function getLinkColor(node, link) {
+  return isNeighborLink(node, link) ? 'green' : 'rgba(150,150,150,0.6)'
+}
+//Text color, change this to make text white
+function getTextColor(node, neighbors) {
+  return Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1 ? 'green' : 'black' //'white'
+}
+
+
+//Parameters
+var width = window.innerWidth;
+//var width = 1800;
+var height = window.innerHeight;
+//var height = 1000;
+var radius = 6;
+
+
+//SVG Container
+var svg = d3.select('svg')
+svg.attr('width', width).attr('height', height).style("background-color","#fff");//#e6f2ff
+var linkElements,
+  nodeElements,
+  textElements
+
+svg.append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .style("fill", "none")//"none" - change to black
+  .style("pointer-events","all")
+  .call(d3.zoom()
+    .scaleExtent([1/2,4])
+	.on("zoom", zoomed));
+
+var g = svg.append("g")
+
+function zoomed() {
+  g.attr("transform",d3.event.transform);
+}  
+  
+  
+// we use svg groups to logically group the elements together
+var linkGroup = g.append('g').attr('class', 'links')
+var nodeGroup = g.append('g').attr('class', 'nodes')
+var textGroup = g.append('g').attr('class', 'texts')
+// we use this reference to select/deselect
+// after clicking the same element twice
+var selectedId
+
+
+// simulation setup with all forces
+var linkForce = d3
+  .forceLink()
+  .id(function (link) { return link.id })
+  .distance(200)
+  .strength(function (link) { return link.strength })
+
+var simulation = d3.forceSimulation()
+  .force('link', linkForce)
+  .force('charge', d3.forceManyBody().strength(-320))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+  .force("x", d3.forceX(function(d){
+	if(d.group === 0){
+		return width/2
+	}
+	else if (d.group === 1) {
+		return 3*width/4
+	}
+	else if (d.group === 2){
+		return 3*width/4
+	}
+	else if (d.group === 3){
+		return width/4
+	}
+	else if (d.group === 4){
+		return width/4
+	}
+	else if (d.group === 5){
+		return width/2
+	}
+	else if (d.group === 6){
+		return width/2
+	}
+	else {
+		return width/2
+	}
+  
+  }).strength(0.1))
+  
+  .force("y", d3.forceY(function(d) {
+  
+	if(d.group === 0){
+		return height/2
+	}
+	else if (d.group === 1) {
+		return 1*height/4
+	}
+	else if (d.group === 2){
+		return 3*height/4
+	}
+	else if (d.group === 3){
+		return 1*height/4
+	}
+	else if (d.group === 4){
+		return 3*height/4
+	}
+	else if (d.group === 5){
+		return 1*height/4
+	}
+	else if (d.group === 6){
+		return 3*height/4
+	}
+	else {
+		return height/2
+	}
+  
+  }).strength(0.1))
+  
+ //drag and drop
+var dragDrop = d3.drag().on('start', function (node) {
+  node.fx = node.x
+  node.fy = node.y
+}).on('drag', function (node) {
+  simulation.alphaTarget(0.7).restart()
+  node.fx = d3.event.x
+  node.fy = d3.event.y
+}).on('end', function (node) {
+  if (!d3.event.active) {
+    simulation.alphaTarget(0)
+  }
+  node.fx = null
+  node.fy = null
+})
+
+
+//Selection
+// select node is called on every click
+// we either update the data according to the selection
+// or reset the data if the same node is clicked twice
+function selectNode(selectedNode) {
+  if (selectedId === selectedNode.id) {
+    selectedId = undefined
+    resetData()
+    updateSimulation()
+  } else {
+    selectedId = selectedNode.id
+    updateData(selectedNode)
+    updateSimulation()
+  }
+  var neighbors = getNeighbors(selectedNode)
+  // we modify the styles to highlight selected nodes
+  nodeElements.attr('fill', function (node) { return getNodeColor(node, neighbors) })
+  textElements.attr('fill', function (node) { return getTextColor(node, neighbors) })
+  linkElements.attr('stroke', function (link) { return getLinkColor(selectedNode, link) })
+}
+
+//Reset
+// this helper simply adds all nodes and links
+// that are missing, to recreate the initial state
+function resetData() {
+  var nodeIds = nodes.map(function (node) { return node.id })
+  baseNodes.forEach(function (node) {
+    if (nodeIds.indexOf(node.id) === -1) {
+      nodes.push(node)
+    }
+  })
+  links = baseLinks
+}
+// diffing and mutating the data
+function updateData(selectedNode) {
+  var neighbors = getNeighbors(selectedNode)
+  var newNodes = baseNodes.filter(function (node) {
+    return neighbors.indexOf(node.id) > -1 || node.level === 1
+  })
+  var diff = {
+    removed: nodes.filter(function (node) { return newNodes.indexOf(node) === -1 }),
+    added: newNodes.filter(function (node) { return nodes.indexOf(node) === -1 })
+  }
+  diff.removed.forEach(function (node) { nodes.splice(nodes.indexOf(node), 1) })
+  diff.added.forEach(function (node) { nodes.push(node) })
+  links = baseLinks.filter(function (link) {
+    return link.target.id === selectedNode.id || link.source.id === selectedNode.id
+  })
+}
+
+
+function updateGraph() {
+  // links
+  linkElements = linkGroup.selectAll('line')
+    .data(links, function (link) {
+      return link.target.id + link.source.id
+    })
+  linkElements.exit().remove()
+  var linkEnter = linkElements
+    .enter().append('line')
+    .attr('stroke-width', 2)
+    .attr('stroke', 'rgba(150, 150, 150, 0.6)')
+  linkElements = linkEnter.merge(linkElements)
+  // nodes
+  nodeElements = nodeGroup.selectAll('circle')
+    .data(nodes, function (node) { return node.id })
+  nodeElements.exit().remove()
+  var nodeEnter = nodeElements
+    .enter()
+    .append('circle')
+	//Node size - targets level 0 objects
+    .attr('r', function(node) {
+	if (node.radius === 25) {
+	  return '25'
+	}
+	else if (node.radius === 15) {
+	  return '15'
+	}
+	else if (node.radius === 12) {
+	  return '12'
+	}
+	else {
+	  return '9'
+	}
+	})
+	
+	//Starting Color - is cancelled out by neighborColor
+    .attr('fill', function (node) { 
+	if (node.group === 0) {
+	  return 'rgba(255,0,0,1.0)'//'red'
+	}
+	else if (node.radius === 12) {
+	  return 'rgba(0,153,51,1.0)'//SPECIFIC TO DEGREE NODES
+	}
+	else if (node.group === 1) {
+	  return 'rgba(51,51,255,1.0)'//'blue'
+	}
+	else if (node.group === 2) {
+	  return 'rgba(255,153,51,1.0)'//'orange'
+	}
+	else if (node.group === 3) {
+	  return 'rgba(153,0,153,1.0)'//'purple'
+	}
+	else if (node.group === 4) {
+	  return 'rgba(0,0,153,1.0)'//'MidnightBlue'
+	}
+	else if (node.group === 5) {
+	  return 'rgba(0,204,153,1.0)'//'LightGreen'
+	}
+	else if (node.group === 6) {
+	  return 'rgba(255,102,255,1.0)'//'RebeccaPurple'
+	}
+	else if (node.group === 7) {
+	  return 'rgba(204,0,102,1.0)'//SPECIFIC TO UK DEGREE NODE
+	}
+	else {
+	  return 'rgba(102,153,153,1.0)'//'void'
+	}
+	})
+    .call(dragDrop)
+    // we link the selectNode method here
+    // to update the graph on every click
+    .on('click', selectNode)
+  nodeElements = nodeEnter.merge(nodeElements)
+  // texts
+  textElements = textGroup.selectAll('text')
+    .data(nodes, function (node) { return node.id })
+  textElements.exit().remove()
+  var textEnter = textElements
+    .enter()
+    .append('text')
+    .text(function (node) { return node.label })
+	//Text size
+    .attr('font-size',function(node) {
+	if (node.radius === 25) {
+	  return '20'
+	}
+	else if (node.radius === 15) {
+	  return '15'
+	}
+	else if (node.radius === 12) {
+	  return '11'
+	}
+	else {
+	  return '9'
+	}
+	})
+	
+	
+	
+    .attr('dx', 15)
+    .attr('dy', 4)
+  textElements = textEnter.merge(textElements)
+}
+
+
+function updateSimulation() {
+  updateGraph()
+  simulation.nodes(nodes).on('tick', () => {
+    nodeElements
+      .attr('cx', function (node) { return node.x  })//= Math.max(radius, Math.min(width-radius, node.x));
+      .attr('cy', function (node) { return node.y })//= Math.max(radius, Math.min(height-radius, node.y));
+    textElements
+      .attr('x', function (node) { return node.x })
+      .attr('y', function (node) { return node.y })
+    linkElements
+      .attr('x1', function (link) { return link.source.x })
+      .attr('y1', function (link) { return link.source.y })
+      .attr('x2', function (link) { return link.target.x })
+      .attr('y2', function (link) { return link.target.y })
+  })
+  simulation.force('link').links(links)
+  simulation.alphaTarget(0.7).restart()
+}
+
+
+
+// last but not least, we call updateSimulation
+// to trigger the initial render
+updateSimulation()
+</script>
